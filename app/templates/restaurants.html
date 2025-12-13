@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<head>
+    <style>
+        html {
+            background-color: aliceblue;
+        }
+        .mycenter{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="mycenter">Welcome to Good Restaurants!</h1>
+    {% for item in items %}
+    <a href="/restaurant/{{item.id}}/">{{item.name}}</a>
+    <br>
+    {% endfor %}
+</body>
