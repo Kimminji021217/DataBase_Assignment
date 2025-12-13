@@ -7,18 +7,23 @@
 <body>
     <h2>Steel Plates Fault List</h2>
 
+    <a href="/add">Add New Plate</a>
+    <br><br>
+
     <table border="1">
         <tr>
-            {% for col in columns %}
-                <th>{{ col }}</th>
-            {% endfor %}
+            <th>ID</th>
+            <th>Fault Type</th>
+            <th>Action</th>
         </tr>
 
         {% for row in rows %}
         <tr>
-            {% for cell in row %}
-                <td>{{ cell }}</td>
-            {% endfor %}
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>
+                <a href="/delete/{{ row[0] }}">Delete</a>
+            </td>
         </tr>
         {% endfor %}
     </table>
