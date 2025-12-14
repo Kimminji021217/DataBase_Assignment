@@ -1,20 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>Add Plate</title>
+    <style>
+        html { background-color: oldlace; }
+        body {
+            background-color: antiquewhite;
+            border: 1px solid burlywood;
+            padding: 20px;
+            margin: 20px auto;
+            width: 60%;
+            text-align: center;
+        }
+        input {
+            padding: 6px;
+        }
+        button {
+            padding: 6px 12px;
+        }
+    </style>
 </head>
+
 <body>
     <h2>Add New Plate</h2>
 
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
     <form method="post">
-        <label>Fault Type:</label>
+        <label>Fault Type:</label><br><br>
         <input type="text" name="fault_type" required>
         <br><br>
         <button type="submit">Add</button>
     </form>
 
-    <br>
-    <a href="/plates">Back to list</a>
+    <p><a href="/plates">← Back to list</a></p>
 </body>
 </html>
