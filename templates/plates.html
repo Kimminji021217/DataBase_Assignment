@@ -1,39 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Steel Plates Faults</title>
+    <meta charset="utf-8">
+    <title>Steel Plates Database</title>
+    <style>
+        html {
+            background-color: oldlace;
+        }
+        body {
+            background-color: antiquewhite;
+            border: 1px solid burlywood;
+            padding: 20px;
+            margin: 20px auto;
+            width: 80%;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+        th, td {
+            border: 1px solid burlywood;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: moccasin;
+        }
+        a {
+            text-decoration: none;
+            color: darkslategray;
+        }
+        .top-link {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
+
 <body>
-    <h2>Steel Plates Fault List</h2>
+    <h1>Steel Plates Fault Database</h1>
+    <h2>Database-driven Web Application</h2>
 
-    <a href="/add">Add New Plate</a>
-    <br><br>
+    <div class="top-link">
+        <a href="/add">➕ Add New Plate</a>
+    </div>
 
-    <table border="1">
+    <table>
         <tr>
             <th>ID</th>
-            <th>Thickness</th>
-            <th>Width</th>
-            <th>Surface Area</th>
             <th>Fault Type</th>
+            <th>Action</th>
         </tr>
 
         {% for row in rows %}
         <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-            <td>{{ row[3] }}</td>
-            <td>{{ row[4] }}</td>
+            <td>{{ row["id"] }}</td>
+            <td>{{ row["fault_type"] }}</td>
+            <td>
+                <a href="/edit/{{ row['id'] }}">Edit</a> |
+                <a href="/delete/{{ row['id'] }}">Delete</a>
+            </td>
         </tr>
         {% endfor %}
     </table>
-
-    <p>
-      <a href="/plates?page={{ page - 1 }}">Prev</a> |
-      <a href="/plates?page={{ page + 1 }}">Next</a>
-    </p>
-
 </body>
 </html>
