@@ -1,4 +1,4 @@
-﻿feat_1,feat_2,feat_3,feat_4,feat_5,feat_6,feat_7,feat_8,feat_9,feat_10,feat_11,feat_12,feat_13,feat_14,feat_15,feat_16,feat_17,feat_18,feat_19,feat_20,feat_21,feat_22,feat_23,feat_24,feat_25,feat_26,feat_27,fault_type
+﻿thickness,width,length,surface_area,edge_roughness,surface_variance,brightness,reflectivity,luminosity,hardness,density,temperature,vibration_level,pressure,tensile_strength,yield_strength,elongation,grain_size,oxidation_level,corrosion_index,crack_density,scratch_intensity,stain_ratio,defect_area_ratio,flatness,alignment_error,quality_score,fault_type
 42,50,270900,270944,267,17,44,24220,76,108,1687,1,0,80,0.0498,0.2415,0.1818,0.0047,0.4706,1.0,1.0,2.4265,0.9031,1.6435,0.8182,-0.2913,0.5822,fault_0
 645,651,2538079,2538108,108,10,30,11397,84,123,1687,1,0,80,0.7647,0.3793,0.2069,0.0036,0.6,0.9667,1.0,2.0334,0.7782,1.4624,0.7931,-0.1756,0.2984,fault_0
 829,835,1553913,1553931,71,8,19,7972,99,125,1623,1,0,100,0.971,0.3426,0.3333,0.0037,0.75,0.9474,1.0,1.8513,0.7782,1.2553,0.6667,-0.1228,0.215,fault_0

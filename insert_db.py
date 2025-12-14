@@ -39,3 +39,36 @@ df.to_sql("plates", conn, if_exists="append", index=False)
 # 저장 후 종료
 conn.commit()
 conn.close()
+
+# -----------------------------
+# faults 테이블 생성 (결함 정의)
+# -----------------------------
+
+conn = sqlite3.connect("app.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS faults (
+    fault_code TEXT PRIMARY KEY,
+    fault_name TEXT,
+    description TEXT
+)
+""")
+
+fault_data = [
+    ("fault_0", "No Defect", "No significant surface or structural defect detected"),
+    ("fault_1", "Surface Scratch", "Scratches observed on the plate surface"),
+    ("fault_2", "Edge Crack", "Cracks detected along the edges of the plate"),
+    ("fault_3", "Internal Crack", "Internal structural cracks detected"),
+    ("fault_4", "Corrosion", "Corrosion-related surface degradation"),
+    ("fault_5", "Stain", "Surface contamination or staining detected"),
+    ("fault_6", "Deformation", "Shape deformation detected")
+]
+
+cursor.executemany(
+    "INSERT OR IGNORE INTO faults VALUES (?, ?, ?)",
+    fault_data
+)
+
+conn.commit()
+conn.close()
