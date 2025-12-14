@@ -52,14 +52,26 @@
     <table>
         <tr>
             <th>ID</th>
-            <th>Fault Type</th>
+            <th>Thickness</th>
+            <th>Width</th>
+            <th>Surface Area</th>
+
+            <th>Fault Name</th>
+            <th>Description</th>
+
             <th>Action</th>
         </tr>
 
         {% for row in rows %}
         <tr>
             <td>{{ row["id"] }}</td>
-            <td>{{ row["fault_type"] }}</td>
+            <td>{{ row["thickness"] }}</td>
+            <td>{{ row["width"] }}</td>
+            <td>{{ row["surface_area"] }}</td>
+
+            <td>{{ row["fault_name"] }}</td>
+            <td>{{ row["description"] }}</td>
+
             <td>
                 <a href="/edit/{{ row['id'] }}">Edit</a> |
                 <a href="/delete/{{ row['id'] }}">Delete</a>
@@ -67,5 +79,19 @@
         </tr>
         {% endfor %}
     </table>
+    <div style="margin-top:20px; text-align:center;">
+        {% if page > 1 %}
+            <a href="/plates?page={{ page - 1 }}">⬅ Previous</a>
+        {% endif %}
+
+        <span style="margin: 0 15px;">
+            Page {{ page }}
+        </span>
+
+        {% if rows|length == 50 %}
+            <a href="/plates?page={{ page + 1 }}">Next ➡</a>
+        {% endif %}
+    </div>
+
 </body>
 </html>

@@ -5,7 +5,9 @@ app = Flask(__name__)
 
 def get_db_connection():
     conn = sqlite3.connect("app.db")
+    conn.row_factory = sqlite3.Row
     return conn
+
 
 @app.route("/")
 def index():
@@ -30,9 +32,10 @@ def show_plates():
             p.thickness,
             p.width,
             p.surface_area,
-            f.fault_name
+            f.fault_name,
+            f.description
         FROM plates p
-        JOIN faults f
+        LEFT JOIN faults f
           ON p.fault_type = f.fault_code
         ORDER BY p.id
         LIMIT ? OFFSET ?
