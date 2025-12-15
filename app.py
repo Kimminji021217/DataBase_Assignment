@@ -28,16 +28,13 @@ def show_plates():
     cursor.execute(
         """
         SELECT
-            p.id,
-            p.thickness,
-            p.width,
-            p.surface_area,
+            pn.plate_id,
             f.fault_name,
             f.description
-        FROM plates p
+        FROM plates_new pn
         LEFT JOIN faults f
-          ON p.fault_type = f.fault_code
-        ORDER BY p.id
+        ON pn.fault_code = f.fault_code
+        ORDER BY pn.plate_id
         LIMIT ? OFFSET ?
         """,
         (per_page, offset)
@@ -51,6 +48,42 @@ def show_plates():
         rows=rows,
         page=page
     )
+
+@app.route("/plates/<int:plate_id>")
+def plate_detail(plate_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            pn.plate_id,
+            f.fault_name,
+            f.description,
+            m.thickness,
+            m.width,
+            m.surface_area
+        FROM plates_new pn
+        LEFT JOIN faults f
+          ON pn.fault_code = f.fault_code
+        LEFT JOIN plate_measurements m
+          ON pn.plate_id = m.plate_id
+        WHERE pn.plate_id = ?
+        """,
+        (plate_id,)
+    )
+
+    row = cursor.fetchone()
+    conn.close()
+
+    if row is None:
+        return "Plate not found", 404
+
+    return render_template(
+        "plate_detail.html",
+        plate=row
+    )
+
 
 @app.route("/add", methods=["GET", "POST"])
 def add_plate():
