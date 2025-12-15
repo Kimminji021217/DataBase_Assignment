@@ -2,40 +2,64 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Add Plate</title>
+    <title>Add New Plate</title>
     <style>
-        html { background-color: oldlace; }
         body {
-            background-color: antiquewhite;
-            border: 1px solid burlywood;
-            padding: 20px;
-            margin: 20px auto;
-            width: 60%;
-            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
-        input {
+        .container {
+            width: 50%;
+            margin: 80px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 6px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+        input, select {
+            width: 100%;
             padding: 6px;
+            margin-top: 5px;
         }
         button {
-            padding: 6px 12px;
+            margin-top: 20px;
+            padding: 8px 14px;
+            background: #2c7be5;
+            color: white;
+            border: none;
+            border-radius: 4px;
         }
     </style>
 </head>
 
 <body>
-    <h2>Add New Plate</h2>
-
-    {% if error %}
-        <p style="color:red;">{{ error }}</p>
-    {% endif %}
+<div class="container">
+    <h1>Add New Steel Plate</h1>
 
     <form method="post">
-        <label>Fault Type:</label><br><br>
-        <input type="text" name="fault_type" required>
-        <br><br>
-        <button type="submit">Add</button>
-    </form>
+        <label>Fault Type</label>
+        <select name="fault_code" required>
+            {% for f in faults %}
+                <option value="{{ f['fault_code'] }}">
+                    {{ f['fault_name'] }}
+                </option>
+            {% endfor %}
+        </select>
 
-    <p><a href="/plates">← Back to list</a></p>
+        <label>Thickness</label>
+        <input type="number" step="0.01" name="thickness" required>
+
+        <label>Width</label>
+        <input type="number" step="0.01" name="width" required>
+
+        <label>Surface Area</label>
+        <input type="number" step="0.01" name="surface_area" required>
+
+        <button type="submit">Add Plate</button>
+    </form>
+</div>
 </body>
 </html>

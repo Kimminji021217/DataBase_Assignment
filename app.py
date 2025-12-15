@@ -242,6 +242,52 @@ def filter_plates():
         max_sa=max_sa
     )
 
+@app.route("/add", methods=["GET", "POST"])
+def add_plate():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # fault 목록 (select box용)
+    cursor.execute("SELECT fault_code, fault_name FROM faults")
+    faults = cursor.fetchall()
+
+    if request.method == "POST":
+        fault_code = request.form["fault_code"]
+        thickness = request.form["thickness"]
+        width = request.form["width"]
+        surface_area = request.form["surface_area"]
+
+        try:
+            # 🔹 트랜잭션 시작
+            cursor.execute(
+                "INSERT INTO plates_new (fault_code) VALUES (?)",
+                (fault_code,)
+            )
+
+            plate_id = cursor.lastrowid  # 방금 생성된 plate_id
+
+            cursor.execute(
+                """
+                INSERT INTO plate_measurements
+                (plate_id, thickness, width, surface_area)
+                VALUES (?, ?, ?, ?)
+                """,
+                (plate_id, thickness, width, surface_area)
+            )
+
+            conn.commit()
+
+        except Exception as e:
+            conn.rollback()
+            conn.close()
+            return f"Error occurred: {e}"
+
+        conn.close()
+        return redirect("/plates")
+
+    conn.close()
+    return render_template("add_plate.html", faults=faults)
+
 # --------------------
 # Run
 # --------------------
