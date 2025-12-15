@@ -48,6 +48,20 @@
     <div class="top-link">
         <a href="/add">+ Add New Plate</a>
     </div>
+    
+    <form method="get" action="/plates">
+        <label for="fault">Filter by Fault:</label>
+        <select name="fault" id="fault">
+            <option value="">All</option>
+            {% for f in faults %}
+                <option value="{{ f['fault_code'] }}"
+                    {% if selected_fault == f['fault_code'] %}selected{% endif %}>
+                    {{ f['fault_name'] }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">Apply</button>
+    </form>
 
     <table>
         <tr>

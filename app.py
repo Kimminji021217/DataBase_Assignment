@@ -16,6 +16,8 @@ def index():
 @app.route("/plates")
 def show_plates():
     page = request.args.get("page", default=1, type=int)
+    fault = request.args.get("fault")
+
     if page < 1:
         page = 1
 
@@ -41,11 +43,16 @@ def show_plates():
     )
 
     rows = cursor.fetchall()
+    cursor.execute("SELECT fault_code, fault_name FROM faults")
+    faults = cursor.fetchall()
+
     conn.close()
 
     return render_template(
         "plates.html",
         rows=rows,
+        faults=faults,
+        selected_fault=fault,
         page=page
     )
 
