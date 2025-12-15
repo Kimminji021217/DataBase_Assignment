@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Filtered Plates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 80px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 6px;
+        }
+        h1 {
+            margin-top: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        a.button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 14px;
+            background: #2c7be5;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Filtered Plates</h1>
+
+    <!-- 🔹 Applied filter summary -->
+    <div style="margin-bottom:20px;">
+        <p>
+            <strong>Fault:</strong>
+            {% if fault_name %}
+                {{ fault_name }}
+            {% else %}
+                All
+            {% endif %}
+        </p>
+
+        {% if min_th is not none or max_th is not none %}
+        <p>
+            <strong>Thickness range:</strong>
+            {{ min_th if min_th is not none else "-" }}
+            –
+            {{ max_th if max_th is not none else "-" }}
+        </p>
+        {% endif %}
+
+        {% if min_w is not none or max_w is not none %}
+        <p>
+            <strong>Width range:</strong>
+            {{ min_w if min_w is not none else "-" }}
+            –
+            {{ max_w if max_w is not none else "-" }}
+        </p>
+        {% endif %}
+
+        {% if min_sa is not none or max_sa is not none %}
+        <p>
+            <strong>Surface area range:</strong>
+            {{ min_sa if min_sa is not none else "-" }}
+            –
+            {{ max_sa if max_sa is not none else "-" }}
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- 🔹 Result table -->
+    <table>
+        <tr>
+            <th>Plate ID</th>
+            <th>Fault</th>
+            <th>Thickness</th>
+            <th>Width</th>
+            <th>Surface Area</th>
+        </tr>
+
+        {% for row in rows %}
+        <tr>
+            <td>{{ row["plate_id"] }}</td>
+            <td>{{ row["fault_name"] }}</td>
+            <td>{{ row["thickness"] }}</td>
+            <td>{{ row["width"] }}</td>
+            <td>{{ row["surface_area"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a class="button" href="/plates">Back to Plate List</a>
+</div>
+</body>
+</html>

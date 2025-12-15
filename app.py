@@ -1,14 +1,20 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request
 import sqlite3
 
 app = Flask(__name__)
 
+# --------------------
+# DB Connection
+# --------------------
 def get_db_connection():
     conn = sqlite3.connect("app.db")
     conn.row_factory = sqlite3.Row
     return conn
 
 
+# --------------------
+# Landing Page
+# --------------------
 @app.route("/")
 def index():
     return """
@@ -42,12 +48,8 @@ def index():
         <div class="container">
             <h1>Steel Plate Fault Database</h1>
             <p>
-                This web application provides access to a database of steel plate
-                inspection records collected during an industrial quality control process.
-            </p>
-            <p>
-                Users can browse steel plates by defect category and view detailed
-                inspection measurements stored in the database.
+                This web application demonstrates a database-driven inspection
+                system for industrial steel plates.
             </p>
             <a class="button" href="/plates">View Plates</a>
         </div>
@@ -55,13 +57,14 @@ def index():
     </html>
     """
 
+
+# --------------------
+# Plate List (fault filter)
+# --------------------
 @app.route("/plates")
 def show_plates():
     page = request.args.get("page", default=1, type=int)
-    fault = request.args.get("fault")
-
-    if page < 1:
-        page = 1
+    selected_fault = request.args.get("fault", default="", type=str)
 
     per_page = 50
     offset = (page - 1) * per_page
@@ -69,35 +72,56 @@ def show_plates():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        SELECT
-            pn.plate_id,
-            f.fault_name,
-            f.description
-        FROM plates_new pn
-        LEFT JOIN faults f
-        ON pn.fault_code = f.fault_code
-        ORDER BY pn.plate_id
-        LIMIT ? OFFSET ?
-        """,
-        (per_page, offset)
-    )
-
-    rows = cursor.fetchall()
-    cursor.execute("SELECT fault_code, fault_name FROM faults")
+    # fault 목록
+    cursor.execute("SELECT fault_code, fault_name FROM faults ORDER BY fault_code")
     faults = cursor.fetchall()
 
+    # plates 목록
+    if selected_fault:
+        cursor.execute(
+            """
+            SELECT
+                pn.plate_id,
+                f.fault_name,
+                f.description
+            FROM plates_new pn
+            JOIN faults f ON pn.fault_code = f.fault_code
+            WHERE pn.fault_code = ?
+            ORDER BY pn.plate_id
+            LIMIT ? OFFSET ?
+            """,
+            (selected_fault, per_page, offset)
+        )
+    else:
+        cursor.execute(
+            """
+            SELECT
+                pn.plate_id,
+                f.fault_name,
+                f.description
+            FROM plates_new pn
+            JOIN faults f ON pn.fault_code = f.fault_code
+            ORDER BY pn.plate_id
+            LIMIT ? OFFSET ?
+            """,
+            (per_page, offset)
+        )
+
+    rows = cursor.fetchall()
     conn.close()
 
     return render_template(
         "plates.html",
         rows=rows,
         faults=faults,
-        selected_fault=fault,
+        selected_fault=selected_fault,
         page=page
     )
 
+
+# --------------------
+# Plate Detail
+# --------------------
 @app.route("/plates/<int:plate_id>")
 def plate_detail(plate_id):
     conn = get_db_connection()
@@ -113,86 +137,113 @@ def plate_detail(plate_id):
             m.width,
             m.surface_area
         FROM plates_new pn
-        LEFT JOIN faults f
-          ON pn.fault_code = f.fault_code
-        LEFT JOIN plate_measurements m
-          ON pn.plate_id = m.plate_id
+        JOIN faults f ON pn.fault_code = f.fault_code
+        JOIN plate_measurements m ON pn.plate_id = m.plate_id
         WHERE pn.plate_id = ?
         """,
         (plate_id,)
     )
 
-    row = cursor.fetchone()
+    plate = cursor.fetchone()
     conn.close()
 
-    if row is None:
+    if plate is None:
         return "Plate not found", 404
 
-    return render_template(
-        "plate_detail.html",
-        plate=row
-    )
+    return render_template("plate_detail.html", plate=plate)
 
 
-@app.route("/add", methods=["GET", "POST"])
-def add_plate():
-    if request.method == "POST":
-        fault_type = request.form["fault_type"]
+# --------------------
+# Range Filter (fault + measurement)
+# --------------------
+@app.route("/plates/filter")
+def filter_plates():
+    fault = request.args.get("fault")
+    min_th = request.args.get("min_th", type=float)
+    max_th = request.args.get("max_th", type=float)
+    min_w = request.args.get("min_w", type=float)
+    max_w = request.args.get("max_w", type=float)
+    min_sa = request.args.get("min_sa", type=float)
+    max_sa = request.args.get("max_sa", type=float)
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
+    query = """
+        SELECT
+            pn.plate_id,
+            f.fault_name,
+            m.thickness,
+            m.width,
+            m.surface_area
+        FROM plates_new pn
+        JOIN faults f ON pn.fault_code = f.fault_code
+        JOIN plate_measurements m ON pn.plate_id = m.plate_id
+        WHERE 1=1
+    """
+    params = []
 
-        cursor.execute(
-            "INSERT INTO plates (fault_type) VALUES (?)",
-            (fault_type,)
-        )
+    if fault:
+        query += " AND pn.fault_code = ?"
+        params.append(fault)
 
-        conn.commit()
-        conn.close()
+    if min_th is not None:
+        query += " AND m.thickness >= ?"
+        params.append(min_th)
 
-        return redirect("/plates")
+    if max_th is not None:
+        query += " AND m.thickness <= ?"
+        params.append(max_th)
 
-    return render_template("add_plate.html")
+    if min_w is not None:
+        query += " AND m.width >= ?"
+        params.append(min_w)
 
-@app.route("/delete/<int:plate_id>")
-def delete_plate(plate_id):
+    if max_w is not None:
+        query += " AND m.width <= ?"
+        params.append(max_w)
+
+    if min_sa is not None:
+        query += " AND m.surface_area >= ?"
+        params.append(min_sa)
+
+    if max_sa is not None:
+        query += " AND m.surface_area <= ?"
+        params.append(max_sa)
+
+
+    query += " ORDER BY pn.plate_id"
+
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM plates WHERE id = ?", (plate_id,))
-
-    conn.commit()
-    conn.close()
-
-    return redirect("/plates")
-
-@app.route("/edit/<int:plate_id>", methods=["GET", "POST"])
-def edit_plate(plate_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    if request.method == "POST":
-        fault_type = request.form["fault_type"]
-
-        cursor.execute(
-            "UPDATE plates SET fault_type = ? WHERE id = ?",
-            (fault_type, plate_id)
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    fault_name = None
+    if fault:
+        conn2 = get_db_connection()
+        cur2 = conn2.cursor()
+        cur2.execute(
+            "SELECT fault_name FROM faults WHERE fault_code = ?",
+            (fault,)
         )
-        conn.commit()
-        conn.close()
-        return redirect("/plates")
-
-    cursor.execute(
-        "SELECT fault_type FROM plates WHERE id = ?",
-        (plate_id,)
-    )
-    fault_type = cursor.fetchone()[0]
+        row = cur2.fetchone()
+        if row:
+            fault_name = row["fault_name"]
+        conn2.close()
     conn.close()
 
     return render_template(
-        "edit_plate.html",
-        fault_type=fault_type
+        "plate_filter.html",
+        rows=rows,
+        fault_code=fault,
+        fault_name=fault_name,
+        min_th=min_th,
+        max_th=max_th,
+        min_w=min_w,
+        max_w=max_w,
+        min_sa=min_sa,
+        max_sa=max_sa
     )
 
+# --------------------
+# Run
+# --------------------
 if __name__ == "__main__":
     app.run(debug=True)
