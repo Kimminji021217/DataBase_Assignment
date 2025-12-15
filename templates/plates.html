@@ -4,98 +4,112 @@
     <meta charset="utf-8">
     <title>Steel Plates Database</title>
     <style>
-        html {
-            background-color: oldlace;
-        }
         body {
-            background-color: antiquewhite;
-            border: 1px solid burlywood;
-            padding: 20px;
-            margin: 20px auto;
-            width: 80%;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
         }
-        h1, h2 {
-            text-align: center;
+        .container {
+            width: 80%;
+            margin: 80px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 6px;
+        }
+        h1 {
+            margin-top: 0;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: white;
+            margin-top: 20px;
         }
         th, td {
-            border: 1px solid burlywood;
-            padding: 8px;
-            text-align: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
         }
         th {
-            background-color: moccasin;
+            background-color: #f0f0f0;
         }
-        a {
+        a.button {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #2c7be5;
+            color: white;
             text-decoration: none;
-            color: darkslategray;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        a.button:hover {
+            background: #1a5dcc;
         }
         .top-link {
-            text-align: right;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
     </style>
+
 </head>
 
 <body>
-    <h1>Steel Plates Fault Database</h1>
-    <h2>Database-driven Web Application</h2>
+    <div class="container">
+        <h1>Steel Plates Fault Database</h1>
+        <h2>Database-driven Web Application</h2>
 
-    <div class="top-link">
-        <a href="/add">+ Add New Plate</a>
-    </div>
-    
-    <form method="get" action="/plates">
-        <label for="fault">Filter by Fault:</label>
-        <select name="fault" id="fault">
-            <option value="">All</option>
-            {% for f in faults %}
-                <option value="{{ f['fault_code'] }}"
-                    {% if selected_fault == f['fault_code'] %}selected{% endif %}>
-                    {{ f['fault_name'] }}
-                </option>
+        <div class="top-link">
+            <a class="button" href="/add">+ Add New Plate</a>
+        </div>
+
+        <form method="get" action="/plates">
+            <label for="fault">Filter by Fault:</label>
+            <select name="fault" id="fault">
+                <option value="">All</option>
+                {% for f in faults %}
+                    <option value="{{ f['fault_code'] }}"
+                        {% if selected_fault == f['fault_code'] %}selected{% endif %}>
+                        {{ f['fault_name'] }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Apply</button>
+        </form>
+
+        <form method="get" action="/plates" style="margin-top:10px;">
+
+        <table>
+            <tr>
+                <th>Plate ID</th>
+                <th>Fault Name</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+
+            {% for row in rows %}
+            <tr>
+                <td>{{ row["plate_id"] }}</td>
+                <td>{{ row["fault_name"] }}</td>
+                <td>{{ row["description"] }}</td>
+
+                <td>
+                    <a class="button" href="/plates/{{ row['plate_id'] }}">View</a>
+                </td>
+            </tr>
             {% endfor %}
-        </select>
-        <button type="submit">Apply</button>
-    </form>
+        </table>
+        <div style="margin-top:20px; text-align:center;">
+            {% if page > 1 %}
+                <a href="/plates?page={{ page - 1 }}">⬅ Previous</a>
+            {% endif %}
 
-    <table>
-        <tr>
-            <th>Plate ID</th>
-            <th>Fault Name</th>
-            <th>Description</th>
-            <th>Action</th>
-        </tr>
+            <span style="margin: 0 15px;">
+                Page {{ page }}
+            </span>
 
-        {% for row in rows %}
-        <tr>
-            <td>{{ row["plate_id"] }}</td>
-            <td>{{ row["fault_name"] }}</td>
-            <td>{{ row["description"] }}</td>
-
-            <td>
-                <a href="/plates/{{ row['plate_id'] }}">View</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    <div style="margin-top:20px; text-align:center;">
-        {% if page > 1 %}
-            <a href="/plates?page={{ page - 1 }}">⬅ Previous</a>
-        {% endif %}
-
-        <span style="margin: 0 15px;">
-            Page {{ page }}
-        </span>
-
-        {% if rows|length == 50 %}
-            <a href="/plates?page={{ page + 1 }}">Next ➡</a>
-        {% endif %}
+            {% if rows|length == 50 %}
+                <a href="/plates?page={{ page + 1 }}">Next ➡</a>
+            {% endif %}
+        </div>
     </div>
-
 </body>
 </html>

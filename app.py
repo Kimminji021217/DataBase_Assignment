@@ -11,7 +11,49 @@ def get_db_connection():
 
 @app.route("/")
 def index():
-    return "<h3>Database Assignment</h3><p><a href='/plates'>View Plates</a></p>"
+    return """
+    <html>
+    <head>
+        <title>Steel Plate Fault Database</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+            }
+            .container {
+                width: 60%;
+                margin: 120px auto;
+                background: white;
+                padding: 40px;
+                border-radius: 6px;
+            }
+            a.button {
+                display: inline-block;
+                margin-top: 20px;
+                padding: 10px 18px;
+                background: #2c7be5;
+                color: white;
+                text-decoration: none;
+                border-radius: 4px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Steel Plate Fault Database</h1>
+            <p>
+                This web application provides access to a database of steel plate
+                inspection records collected during an industrial quality control process.
+            </p>
+            <p>
+                Users can browse steel plates by defect category and view detailed
+                inspection measurements stored in the database.
+            </p>
+            <a class="button" href="/plates">View Plates</a>
+        </div>
+    </body>
+    </html>
+    """
 
 @app.route("/plates")
 def show_plates():
