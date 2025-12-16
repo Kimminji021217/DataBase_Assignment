@@ -112,6 +112,23 @@
             <td>
                 <a class="button" href="/plates/{{ row['plate_id'] }}">View</a>
                 <a class="button" href="/edit/{{ row['plate_id'] }}">Edit</a>
+
+                <form method="post"
+                    action="/delete/{{ row['plate_id'] }}"
+                    style="display:inline;"
+                    onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <button type="submit"
+                            style="
+                                padding:6px 12px;
+                                background:#dc3545;
+                                color:white;
+                                border:none;
+                                border-radius:4px;
+                                cursor:pointer;
+                            ">
+                        Delete
+                    </button>
+                </form>
             </td>
         </tr>
         {% endfor %}

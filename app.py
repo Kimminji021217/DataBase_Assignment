@@ -357,6 +357,34 @@ def edit_plate(plate_id):
         faults=faults
     )
 
+@app.route("/delete/<int:plate_id>", methods=["POST"])
+def delete_plate(plate_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # 먼저 measurement 삭제 (FK 구조 고려)
+        cursor.execute(
+            "DELETE FROM plate_measurements WHERE plate_id = ?",
+            (plate_id,)
+        )
+
+        # 그 다음 plate 삭제
+        cursor.execute(
+            "DELETE FROM plates_new WHERE plate_id = ?",
+            (plate_id,)
+        )
+
+        conn.commit()
+
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return f"Error occurred: {e}"
+
+    conn.close()
+    return redirect("/plates")
+
 
 # --------------------
 # Run
