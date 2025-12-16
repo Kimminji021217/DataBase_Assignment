@@ -36,6 +36,7 @@
             text-decoration: none;
             border-radius: 4px;
             font-size: 14px;
+            margin-right: 5px;
         }
         .top-link { margin-bottom: 15px; }
     </style>
@@ -46,8 +47,7 @@
     <h1>Steel Plates Fault Database</h1>
     <h2>Database-driven Web Application</h2>
 
-    <a class="button" href="/add">+ Add New Plate</a>
-
+    <!-- 🔹 Add button -->
     <div class="top-link">
         <a class="button" href="/add">+ Add New Plate</a>
     </div>
@@ -95,7 +95,7 @@
         <button type="submit">Filter by Range</button>
     </form>
 
-
+    <!-- 🔹 Plate table -->
     <table>
         <tr>
             <th>Plate ID</th>
@@ -111,12 +111,13 @@
             <td>{{ row["description"] }}</td>
             <td>
                 <a class="button" href="/plates/{{ row['plate_id'] }}">View</a>
+                <a class="button" href="/edit/{{ row['plate_id'] }}">Edit</a>
             </td>
         </tr>
         {% endfor %}
     </table>
 
-    <!-- 🔹 Pagination (fault 유지) -->
+    <!-- 🔹 Pagination -->
     <div style="margin-top:20px; text-align:center;">
         {% if page > 1 %}
             <a class="button"

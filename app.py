@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 import sqlite3
 
 app = Flask(__name__)
@@ -287,6 +287,76 @@ def add_plate():
 
     conn.close()
     return render_template("add_plate.html", faults=faults)
+
+@app.route("/edit/<int:plate_id>", methods=["GET", "POST"])
+def edit_plate(plate_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # fault 목록
+    cursor.execute("SELECT fault_code, fault_name FROM faults")
+    faults = cursor.fetchall()
+
+    if request.method == "POST":
+        fault_code = request.form["fault_code"]
+        thickness = request.form["thickness"]
+        width = request.form["width"]
+        surface_area = request.form["surface_area"]
+
+        try:
+            cursor.execute(
+                "UPDATE plates_new SET fault_code = ? WHERE plate_id = ?",
+                (fault_code, plate_id)
+            )
+
+            cursor.execute(
+                """
+                UPDATE plate_measurements
+                SET thickness = ?, width = ?, surface_area = ?
+                WHERE plate_id = ?
+                """,
+                (thickness, width, surface_area, plate_id)
+            )
+
+            conn.commit()
+
+        except Exception as e:
+            conn.rollback()
+            conn.close()
+            return f"Error occurred: {e}"
+
+        conn.close()
+        return redirect(f"/plates/{plate_id}")
+
+    # GET 요청: 기존 데이터 불러오기
+    cursor.execute(
+        """
+        SELECT
+            pn.fault_code,
+            m.thickness,
+            m.width,
+            m.surface_area
+        FROM plates_new pn
+        JOIN plate_measurements m
+          ON pn.plate_id = m.plate_id
+        WHERE pn.plate_id = ?
+        """,
+        (plate_id,)
+    )
+
+    plate = cursor.fetchone()
+    conn.close()
+
+    if plate is None:
+        return "Plate not found", 404
+
+    return render_template(
+        "edit_plate.html",
+        plate=plate,
+        plate_id=plate_id,
+        faults=faults
+    )
+
 
 # --------------------
 # Run

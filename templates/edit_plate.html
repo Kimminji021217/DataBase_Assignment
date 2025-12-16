@@ -4,38 +4,69 @@
     <meta charset="utf-8">
     <title>Edit Plate</title>
     <style>
-        html { background-color: oldlace; }
         body {
-            background-color: antiquewhite;
-            border: 1px solid burlywood;
-            padding: 20px;
-            margin: 20px auto;
-            width: 60%;
-            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
-        input {
+        .container {
+            width: 50%;
+            margin: 80px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 6px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+        input, select {
+            width: 100%;
             padding: 6px;
+            margin-top: 5px;
         }
         button {
-            padding: 6px 12px;
+            margin-top: 20px;
+            padding: 8px 14px;
+            background: #2c7be5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        a {
+            display: inline-block;
+            margin-top: 15px;
         }
     </style>
 </head>
 
 <body>
-    <h2>Edit Plate #{{ plate_id }}</h2>
-
-    {% if error %}
-        <p style="color:red;">{{ error }}</p>
-    {% endif %}
+<div class="container">
+    <h1>Edit Plate</h1>
 
     <form method="post">
-        <label>Fault Type:</label><br><br>
-        <input type="text" name="fault_type" value="{{ fault_type }}" required>
-        <br><br>
-        <button type="submit">Update</button>
+        <label>Fault Type</label>
+        <select name="fault_code">
+            {% for f in faults %}
+                <option value="{{ f['fault_code'] }}"
+                    {% if plate['fault_code'] == f['fault_code'] %}selected{% endif %}>
+                    {{ f['fault_name'] }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label>Thickness</label>
+        <input type="number" step="0.01" name="thickness" value="{{ plate['thickness'] }}" required>
+
+        <label>Width</label>
+        <input type="number" step="0.01" name="width" value="{{ plate['width'] }}" required>
+
+        <label>Surface Area</label>
+        <input type="number" step="0.01" name="surface_area" value="{{ plate['surface_area'] }}" required>
+
+        <button type="submit">Update Plate</button>
     </form>
 
-    <p><a href="/plates">← Back to list</a></p>
+    <a href="/plates/{{ plate_id }}">Back to Detail</a>
+</div>
 </body>
 </html>
